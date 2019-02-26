@@ -1,6 +1,6 @@
 <?php
 
-namespace Em4nl\Unplug;
+namespace Em4nl\U;
 
 
 class Router {
