@@ -1,4 +1,5 @@
 .*.swp
 .*.swo
 .#*
+.phpunit.result.cache
 vendor/
