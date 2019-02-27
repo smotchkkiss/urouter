@@ -89,7 +89,7 @@ class Router {
             'params' => $params,
             'query' => $query,
         );
-  }
+    }
 
     function reconstruct_request_path($path) {
         $path = join('/', $path);
