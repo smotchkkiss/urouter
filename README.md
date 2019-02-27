@@ -22,6 +22,10 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 $router = new Em4nl\U\Router();
 
+// set a base path if this app doesn't live at the root path
+// (right behind the domain)
+$router->base('/my-app');
+
 $router->get('/', function($context) {
     echo 'the index route';
 });
@@ -32,6 +36,10 @@ $router->get('/test', function($context) {
 
 $router->get('/:thing', function($context) {
     echo "I like {$context['params']['thing']}!";
+});
+
+$router->get('/test/*', function($context) {
+    // will match paths of arbitrary length behind /test/ ...
 });
 
 $router->post('/form', function($context) {
@@ -45,6 +53,11 @@ $router->catchall(function($context) {
 
 $router->run();
 ```
+
+Routes don't have to be defined in any particular order, they will
+be matched by specificity automatically. E.g. if you visit
+`/test/`, the `/test` route will match and not the `/:thing` route,
+even if the latter would be defined earlier in the source code.
 
 ## License
 
