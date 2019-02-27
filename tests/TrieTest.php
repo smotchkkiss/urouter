@@ -2,7 +2,7 @@
 
 namespace Em4nl\U;
 
-require_once dirname(__DIR__) . '/router.php';
+require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 use PHPUnit\Framework\TestCase;
 
