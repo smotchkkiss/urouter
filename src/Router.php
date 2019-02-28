@@ -48,13 +48,9 @@ class Router {
         $request_path = $this->get_request_path();
         $path_parts = explode('?', $request_path, 2);
         $path = explode('/', trim($path_parts[0], '/'));
-        $query = array();
-        if (isset($path_parts[1])) {
-            parse_str($path_parts[1], $query);
-        }
         $route_trie = $this->get_route_trie();
 
-        $this->execute_matching_route($route_trie, $path, $query);
+        $this->execute_matching_route($route_trie, $path);
     }
 
     function get_route_trie() {
@@ -68,10 +64,10 @@ class Router {
         }
     }
 
-    function execute_matching_route($trie, $path, $query) {
+    function execute_matching_route($trie, $path) {
         $params = array();
         $node = $trie->search($path);
-        $context = $this->get_context($path, $params, $query);
+        $context = $this->get_context($path, $params);
 
         if ($node && isset($node->callback)) {
             $callback = $node->callback;
@@ -82,12 +78,11 @@ class Router {
         }
     }
 
-    function get_context($path, $params, $query) {
+    function get_context($path, $params) {
         $request_path = $this->reconstruct_request_path($path);
         return array(
             'path' => $request_path,
             'params' => $params,
-            'query' => $query,
         );
     }
 
