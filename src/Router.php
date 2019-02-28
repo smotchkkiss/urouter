@@ -66,24 +66,15 @@ class Router {
 
     function execute_matching_route($trie, $path) {
         $params = array();
-        $node = $trie->search($path);
-        $context = $this->get_context($path, $params);
+        $node = $trie->search($path, $params);
 
         if ($node && isset($node->callback)) {
             $callback = $node->callback;
-            $callback($context);
+            call_user_func_array($callback, $params);
         } elseif ($this->catchall_callback) {
             $callback = $this->catchall_callback;
-            $callback($context);
+            call_user_func_array($callback, $params);
         }
-    }
-
-    function get_context($path, $params) {
-        $request_path = $this->reconstruct_request_path($path);
-        return array(
-            'path' => $request_path,
-            'params' => $params,
-        );
     }
 
     function reconstruct_request_path($path) {

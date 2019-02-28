@@ -26,19 +26,19 @@ $router = new Em4nl\U\Router();
 // (right behind the domain)
 $router->base('/my-app');
 
-$router->get('/', function($context) {
+$router->get('/', function() {
     echo 'the index route';
 });
 
-$router->get('/test', function($context) {
-    echo "the {$context['path']} route";
+$router->get('/test', function() {
+    echo "the /test route";
 });
 
-$router->get('/:thing', function($context) {
-    echo "I like {$context['params']['thing']}!";
+$router->get('/:thing', function($thing) {
+    echo "I like $thing!";
 });
 
-$router->get('/test/*', function($context) {
+$router->get('/test/*', function($wildcard_match) {
     // will match paths of arbitrary length behind /test/ ...
 });
 
@@ -46,7 +46,7 @@ $router->post('/form', function($context) {
     // ...
 });
 
-$router->catchall(function($context) {
+$router->catchall(function() {
     header('HTTP/1.1 404 Not Found');
     // ...
 });
