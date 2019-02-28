@@ -59,6 +59,20 @@ be matched by specificity automatically. E.g. if you visit
 `/test/`, the `/test` route will match and not the `/:thing` route,
 even if the latter would be defined earlier in the source code.
 
+## Development
+
+Install dependencies
+
+```sh
+composer install
+```
+
+Run tests
+
+```sh
+./vendor/bin/phpunit tests
+```
+
 ## License
 
 [The MIT License](https://github.com/em4nl/wpinstall/blob/master/LICENSE)
