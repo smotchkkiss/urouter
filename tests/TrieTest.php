@@ -378,4 +378,13 @@ class TrieTest extends TestCase {
         $this->assertNotEquals($res5, $node);
         $this->assertNotEquals($res6, $node);
     }
+
+    function testPopulatesParams1() {
+        $trie = new Trie();
+        $node = &$trie->insert(['one', ':two']);
+        $params1 = [];
+        $res1 = $trie->search(['one', '222'], $params1);
+        $this->assertNotEmpty($params1);
+        $this->assertEquals(1, count($params1));
+    }
 }

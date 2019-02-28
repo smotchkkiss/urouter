@@ -54,8 +54,7 @@ class Trie {
         return $trie->static_nodes[$segment];
     }
 
-    function search($path) {
-        $params = array();
+    function search($path, &$params=array()) {
         return $this->_search($this->root, $path, 0, $params);
     }
 
