@@ -78,13 +78,13 @@ class Trie {
     }
 
     function _search_param_node($trie, $path, $index, &$params) {
-        $params[$trie->param_name] = $path[$index];
+        $params[] = $path[$index];
         $node = $trie->param_node;
         return $this->_search($node, $path, $index + 1, $params);
     }
 
     function _search_wildcard_node($trie, $path, $index, &$params) {
-        $params[$trie->wildcard_name] = join('/', array_slice($path, $index));
+        $params[] = join('/', array_slice($path, $index));
         return $trie->wildcard_node;
     }
 }

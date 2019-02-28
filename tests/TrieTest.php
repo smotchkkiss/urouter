@@ -386,5 +386,6 @@ class TrieTest extends TestCase {
         $res1 = $trie->search(['one', '222'], $params1);
         $this->assertNotEmpty($params1);
         $this->assertEquals(1, count($params1));
+        $this->assertEquals('222', $params1[0]);
     }
 }
