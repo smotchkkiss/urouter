@@ -416,4 +416,152 @@ class TrieTest extends TestCase {
         $this->assertEquals('amberg', $params5['else']);
         $this->assertEquals('not', $params5['might']);
     }
+
+    function testRootWildcardNodeWorks() {
+        $trie = new Trie();
+        $static1 = &$trie->insert(['static1']);
+        $static2 = &$trie->insert(['static2']);
+        $parametrised = &$trie->insert(['parametrised', ':param1']);
+        $wildcard = &$trie->insert(['*']);
+        $res1 = $trie->search(['static1']);
+        $res2 = $trie->search(['static2']);
+        $this->assertEquals($static1, $res1);
+        $this->assertEquals($static2, $res2);
+        $res3_params = [];
+        $res3 = $trie->search(['parametrised', 'ginko'], $res3_params);
+        $this->assertEquals($parametrised, $res3);
+        $this->assertEquals('ginko', $res3_params['param1']);
+        $res4_params = [];
+        $res4 = $trie->search(['parametrised', 'nix'], $res4_params);
+        $this->assertEquals($parametrised, $res4);
+        $this->assertEquals('nix', $res4_params['param1']);
+        $res5_params = [];
+        $res5 = $trie->search([''], $res5_params);
+        $this->assertEquals($wildcard, $res5);
+        $this->assertEquals('', $res5_params['*']);
+        $res6_params = [];
+        $res6 = $trie->search(['witschel'], $res6_params);
+        $this->assertEquals($wildcard, $res6);
+        $this->assertEquals('witschel', $res6_params['*']);
+        $res7_params = [];
+        $res7 = $trie->search(['treebeard', 'fangorn'], $res7_params);
+        $this->assertEquals($wildcard, $res7);
+        $this->assertEquals('treebeard/fangorn', $res7_params['*']);
+        $res8_params = [];
+        $res8 = $trie->search(['aragorn', 'sonof', 'arathorn'], $res8_params);
+        $this->assertEquals($wildcard, $res8);
+        $this->assertEquals('aragorn/sonof/arathorn', $res8_params['*']);
+    }
+
+    function testParamsOrder() {
+        $trie = new Trie();
+
+        $trie->insert(['s1', ':p1']);
+        $params1 = [];
+        $trie->search(['s1', 'P1'], $params1);
+        $params1_keys = array_keys($params1);
+        $params1_values = array_values($params1);
+        $this->assertEquals('p1', $params1_keys[0]);
+        $this->assertEquals('P1', $params1_values[0]);
+
+        $trie->insert(['s2', ':p1', ':p2']);
+        $params2 = [];
+        $trie->search(['s2', 'P1', 'P2'], $params2);
+        $params2_keys = array_keys($params2);
+        $params2_values = array_values($params2);
+        $this->assertEquals('p1', $params2_keys[0]);
+        $this->assertEquals('P1', $params2_values[0]);
+        $this->assertEquals('p2', $params2_keys[1]);
+        $this->assertEquals('P2', $params2_values[1]);
+
+        $trie->insert(['s3', ':p1', ':p2', ':p3']);
+        $params3 = [];
+        $trie->search(['s3', 'P1', 'P2', 'P3'], $params3);
+        $params3_keys = array_keys($params3);
+        $params3_values = array_values($params3);
+        $this->assertEquals('p1', $params3_keys[0]);
+        $this->assertEquals('P1', $params3_values[0]);
+        $this->assertEquals('p2', $params3_keys[1]);
+        $this->assertEquals('P2', $params3_values[1]);
+        $this->assertEquals('p3', $params3_keys[2]);
+        $this->assertEquals('P3', $params3_values[2]);
+
+        $trie->insert(['w1', '*']);
+        $params4 = [];
+        $trie->search(['w1', 'Q1'], $params4);
+        $params4_keys = array_keys($params4);
+        $params4_values = array_values($params4);
+        $this->assertEquals('*', $params4_keys[0]);
+        $this->assertEquals('Q1', $params4_values[0]);
+        $params5 = [];
+        $trie->search(['w1', 'Q1', 'Q2'], $params5);
+        $params5_keys = array_keys($params5);
+        $params5_values = array_values($params5);
+        $this->assertEquals('*', $params5_keys[0]);
+        $this->assertEquals('Q1/Q2', $params5_values[0]);
+        $params6 = [];
+        $trie->search(['w1', 'Q1', 'Q2', 'Q3'], $params6);
+        $params6_keys = array_keys($params6);
+        $params6_values = array_values($params6);
+        $this->assertEquals('*', $params6_keys[0]);
+        $this->assertEquals('Q1/Q2/Q3', $params6_values[0]);
+
+        $trie->insert(['w2', ':p1', '*']);
+        $params7 = [];
+        $trie->search(['w2', 'Q1', 'Q2'], $params7);
+        $params7_keys = array_keys($params7);
+        $params7_values = array_values($params7);
+        $this->assertEquals('p1', $params7_keys[0]);
+        $this->assertEquals('Q1', $params7_values[0]);
+        $this->assertEquals('*', $params7_keys[1]);
+        $this->assertEquals('Q2', $params7_values[1]);
+        $params8 = [];
+        $trie->search(['w2', 'Q1', 'Q2', 'Q3'], $params8);
+        $params8_keys = array_keys($params8);
+        $params8_values = array_values($params8);
+        $this->assertEquals('p1', $params8_keys[0]);
+        $this->assertEquals('Q1', $params8_values[0]);
+        $this->assertEquals('*', $params8_keys[1]);
+        $this->assertEquals('Q2/Q3', $params8_values[1]);
+        $params9 = [];
+        $trie->search(['w2', 'Q1', 'Q2', 'Q3', 'Q4'], $params9);
+        $params9_keys = array_keys($params9);
+        $params9_values = array_values($params9);
+        $this->assertEquals('p1', $params9_keys[0]);
+        $this->assertEquals('Q1', $params9_values[0]);
+        $this->assertEquals('*', $params9_keys[1]);
+        $this->assertEquals('Q2/Q3/Q4', $params9_values[1]);
+
+        $trie->insert(['w3', ':p1', ':p2', '*']);
+        $params10 = [];
+        $trie->search(['w3', 'Q1', 'Q2', 'Q3'], $params10);
+        $params10_keys = array_keys($params10);
+        $params10_values = array_values($params10);
+        $this->assertEquals('p1', $params10_keys[0]);
+        $this->assertEquals('Q1', $params10_values[0]);
+        $this->assertEquals('p2', $params10_keys[1]);
+        $this->assertEquals('Q2', $params10_values[1]);
+        $this->assertEquals('*', $params10_keys[2]);
+        $this->assertEquals('Q3', $params10_values[2]);
+        $params11 = [];
+        $trie->search(['w3', 'Q1', 'Q2', 'Q3', 'Q4'], $params11);
+        $params11_keys = array_keys($params11);
+        $params11_values = array_values($params11);
+        $this->assertEquals('p1', $params11_keys[0]);
+        $this->assertEquals('Q1', $params11_values[0]);
+        $this->assertEquals('p2', $params11_keys[1]);
+        $this->assertEquals('Q2', $params11_values[1]);
+        $this->assertEquals('*', $params11_keys[2]);
+        $this->assertEquals('Q3/Q4', $params11_values[2]);
+        $params12 = [];
+        $trie->search(['w3', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5'], $params12);
+        $params12_keys = array_keys($params12);
+        $params12_values = array_values($params12);
+        $this->assertEquals('p1', $params12_keys[0]);
+        $this->assertEquals('Q1', $params12_values[0]);
+        $this->assertEquals('p2', $params12_keys[1]);
+        $this->assertEquals('Q2', $params12_values[1]);
+        $this->assertEquals('*', $params12_keys[2]);
+        $this->assertEquals('Q3/Q4/Q5', $params12_values[2]);
+    }
 }
