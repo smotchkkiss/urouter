@@ -70,10 +70,10 @@ class Router {
 
         if ($node && isset($node->callback)) {
             $callback = $node->callback;
-            call_user_func_array($callback, $params);
+            $callback($params);
         } elseif ($this->catchall_callback) {
             $callback = $this->catchall_callback;
-            call_user_func_array($callback, $params);
+            $callback($params);
         }
     }
 
