@@ -395,25 +395,25 @@ class TrieTest extends TestCase {
         $trie->insert([':what', ':else', ':might']);
         $params1 = [];
         $trie->search(['one', 'wurm', 'nofretete'], $params1);
-        $this->assertEquals('wurm/nofretete', $params1[0]);
+        $this->assertEquals('wurm/nofretete', $params1['*']);
         $params2 = [];
         $trie->search(['one', 'zobel'], $params2);
-        $this->assertEquals('zobel', $params2[0]);
+        $this->assertEquals('zobel', $params2['*']);
         $params3 = [];
         $trie->search(['two', 'zobel', 'humppaaa'], $params3);
-        $this->assertEquals('zobel', $params3[0]);
-        $this->assertEquals('humppaaa', $params3[1]);
+        $this->assertEquals('zobel', $params3['three']);
+        $this->assertEquals('humppaaa', $params3['*']);
         $params4 = [];
         $trie->search(
             ['two', 'lavazza', 'carazza', 'bifi', 'zerspanen'],
             $params4
         );
-        $this->assertEquals('lavazza', $params4[0]);
-        $this->assertEquals('carazza/bifi/zerspanen', $params4[1]);
+        $this->assertEquals('lavazza', $params4['three']);
+        $this->assertEquals('carazza/bifi/zerspanen', $params4['*']);
         $params5 = [];
         $trie->search(['hunde', 'amberg', 'not'], $params5);
-        $this->assertEquals('hunde', $params5[0]);
-        $this->assertEquals('amberg', $params5[1]);
-        $this->assertEquals('not', $params5[2]);
+        $this->assertEquals('hunde', $params5['what']);
+        $this->assertEquals('amberg', $params5['else']);
+        $this->assertEquals('not', $params5['might']);
     }
 }

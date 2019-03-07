@@ -31,9 +31,7 @@ class Trie {
 
     function &_insert_wildcard_node(&$trie, $segment) {
         if (!$trie->wildcard_node) {
-            $name = $segment ? substr($segment, 1) : 'wildcard';
             $trie->wildcard_node = new Node();
-            $trie->wildcard_name = $name;
         }
         return $trie->wildcard_node;
     }
@@ -84,7 +82,7 @@ class Trie {
     }
 
     function _search_wildcard_node($trie, $path, $index, &$params) {
-        $params[$trie->wildcard_name] = join('/', array_slice($path, $index));
+        $params['*'] = join('/', array_slice($path, $index));
         return $trie->wildcard_node;
     }
 }
