@@ -44,17 +44,28 @@ class Router {
         $this->catchall_callback = $callback;
     }
 
-    function run() {
-        $request_path = $this->get_request_path();
+    function run($mock_request_path=NULL, $mock_request_method='GET') {
+        if (is_null($mock_request_path)) {
+            $is_mock_run = FALSE;
+            $request_path = $this->get_request_path();
+        } else {
+            $is_mock_run = TRUE;
+            $request_path = $mock_request_path;
+        }
         $path_parts = explode('?', $request_path, 2);
         $path = explode('/', trim($path_parts[0], '/'));
-        $route_trie = $this->get_route_trie();
+        $route_trie = $this->get_route_trie($is_mock_run, $mock_request_method);
 
         $this->execute_matching_route($route_trie, $path);
     }
 
-    function get_route_trie() {
-        switch ($_SERVER['REQUEST_METHOD']) {
+    function get_route_trie($is_mock_run, $mock_request_method) {
+        if (!$is_mock_run) {
+            $request_method = $_SERVER['REQUEST_METHOD'];
+        } else {
+            $request_method = $mock_request_method;
+        }
+        switch ($request_method) {
         case 'GET':
             return $this->get_trie;
         case 'POST':
@@ -70,11 +81,20 @@ class Router {
 
         if ($node && isset($node->callback)) {
             $callback = $node->callback;
-            $callback($params);
+            $context = $this->get_context($path, $params);
+            $callback($context);
         } elseif ($this->catchall_callback) {
             $callback = $this->catchall_callback;
-            $callback($params);
+            $context = $this->get_context($path, $params);
+            $callback($context);
         }
+    }
+
+    function get_context($path, $params) {
+        return array(
+            'path' => $this->reconstruct_request_path($path),
+            'params' => $params,
+        );
     }
 
     function reconstruct_request_path($path) {

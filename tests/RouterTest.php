@@ -77,4 +77,36 @@ class RouterTest extends TestCase {
         );
         $this->assertEquals('cheese', $router->get_trie->root->param_name);
     }
+
+    function testCallbackIsCalledWithProperContext() {
+        $router = new Router();
+        $router->get('/', function($context) {
+            $this->assertEquals('/', $context['path']);
+            $this->assertEmpty($context['params']);
+        });
+        $router->run('/');
+
+        $router->get('/wurm', function($context) {
+            $this->assertEquals('/wurm', $context['path']);
+            $this->assertEmpty($context['params']);
+        });
+        $router->run('/wurm');
+
+        $router->get('/about', function($context) {
+            $this->assertEquals('/about', $context['path']);
+            $this->assertEmpty($context['params']);
+        });
+        $router->run('/about/');
+
+        $pagename = '';
+        $router->get('/page/:slug', function($context) use (&$pagename) {
+            $this->assertEquals("/page/$pagename", $context['path']);
+            $this->assertEquals(1, count($context['params']));
+            $this->assertEquals($pagename, $context['params']['slug']);
+        });
+        $pagename = 'mistelzweig';
+        $router->run('/page/mistelzweig');
+        $pagename = 'pikachu';
+        $router->run('/page/pikachu');
+    }
 }
